@@ -1,0 +1,4 @@
+newGroup( "group1" )
+newCommand( "group1", "MoveTo", 1, 0, 0, -20, 2.0, 0, 0, 0 )
+newGroup( "group2" )
+newCommand( "group1", "FollowCurve", 1, 0, 0, -60, 4.0, 20, 0, -40 )

@@ -1,0 +1,13 @@
+﻿  TheMain.cpp
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(190): warning C4018: '>=': signed/unsigned mismatch
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(267): warning C4018: '>=': signed/unsigned mismatch
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(455): warning C4305: '=': truncation from 'double' to 'float'
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(456): warning C4305: '=': truncation from 'double' to 'float'
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(457): warning C4305: '=': truncation from 'double' to 'float'
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(458): warning C4305: '=': truncation from 'double' to 'float'
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(506): warning C4101: 'mvp': unreferenced local variable
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(666): warning C4244: 'initializing': conversion from 'std::chrono::system_clock::rep' to 'unsigned int', possible loss of data
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(620): warning C4715: 'loadScriptFile': not all control paths return a value
+  Skipping... (no relevant changes detected)
+  ModelUtilities.cpp
+  GEFP_Project2.vcxproj -> D:\Fanshawe\Code\MyProjects\GEFP_Project2\Debug\Project2.exe
