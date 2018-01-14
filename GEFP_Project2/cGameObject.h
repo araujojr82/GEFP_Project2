@@ -3,6 +3,7 @@
 
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <string>
 
@@ -24,7 +25,8 @@ public:
 	int getID( void );			// ADDED
 
 	glm::vec3 position;
-	glm::vec3 orientation;
+	//glm::vec3 orientation;
+	glm::mat4x4 orientation;
 	glm::vec3 orientation2;		// HACK (will elimiate this with)
 	glm::vec3 rotation;
 	float scale;

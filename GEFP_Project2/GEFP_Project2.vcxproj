@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cCameraObject.cpp" />
     <ClCompile Include="cComFollowCurve.cpp" />
     <ClCompile Include="cComFollowObject.cpp" />
     <ClCompile Include="cCommandGroup.cpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="cShaderManager.cpp" />
     <ClCompile Include="cTriangle.cpp" />
     <ClCompile Include="cVertex_xyz_rgb.cpp" />
+    <ClCompile Include="GLFW_keyboardCallback.cpp" />
     <ClCompile Include="ModelUtilities.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
@@ -180,6 +182,7 @@
     <ClCompile Include="Utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cCameraObject.h" />
     <ClInclude Include="cComFollowCurve.h" />
     <ClInclude Include="cComFollowObject.h" />
     <ClInclude Include="cCommandGroup.h" />
@@ -198,6 +201,7 @@
     <ClInclude Include="cTriangle.h" />
     <ClInclude Include="cVAOMeshManager.h" />
     <ClInclude Include="cVertex_xyz_rgb.h" />
+    <ClInclude Include="GLFW_keyboardCallback.h" />
     <ClInclude Include="iCommand.h" />
     <ClInclude Include="iDebugRenderer.h" />
     <ClInclude Include="ModelUtilities.h" />

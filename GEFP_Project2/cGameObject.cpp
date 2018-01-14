@@ -10,7 +10,7 @@ cGameObject::cGameObject()
 
 	this->scale = 1.0f;	// (not zero)
 	this->position = glm::vec3(0.0f);
-	this->orientation = glm::vec3(0.0f);
+	this->orientation = glm::mat4x4( 1.0f );
 	this->orientation2 = glm::vec3(0.0f);
 
 	this->vel = glm::vec3( 0.0f );

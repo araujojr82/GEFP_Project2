@@ -25,6 +25,9 @@
     <Filter Include="DebugRenderer">
       <UniqueIdentifier>{c573c138-2f34-4255-9ab1-583db7699f15}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{6d0d9569-978c-4668-865d-b1cbcf57d78b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TheMain.cpp">
@@ -99,6 +102,12 @@
     <ClCompile Include="cComRotate.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
+    <ClCompile Include="cCameraObject.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="GLFW_keyboardCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cMesh.h">
@@ -169,6 +178,12 @@
     </ClInclude>
     <ClInclude Include="cComRotate.h">
       <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="cCameraObject.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="GLFW_keyboardCallback.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -27,9 +27,11 @@
 #include "Physics.h"
 #include "cLightManager.h"
 #include "cDebugRenderer.h"
+#include "cCameraObject.h"
 
 #include "cCommandScheduler.h"
 #include "cLuaBrain.h"
+#include "GLFW_keyboardCallback.h"
 
 int g_GameObjNumber = 0;				// game object vector position number 
 int g_LightObjNumber = 0;				// light object vector position
@@ -50,10 +52,8 @@ std::vector< cGameObject* > g_vecGameObjects;
 
 cCommandScheduler g_theScheduler;
 
-glm::vec3 g_cameraXYZ = glm::vec3( -82.0f, 107.0f, 68.0f );
-glm::vec3 g_cameraTarget_XYZ = glm::vec3( 0.0f, 0.0f, 0.0f );
+cCameraObject* g_pCamera = NULL;
 
-// TODO include camera new code
 
 cVAOMeshManager*	g_pVAOManager = 0;		// or NULL or nullptr
 cShaderManager*		g_pShaderManager;		// Heap, new (and delete)
@@ -73,6 +73,7 @@ GLint uniLoc_eyePosition = -1;	// Camera position
 GLint uniLoc_mModel = -1;
 GLint uniLoc_mView = -1;
 GLint uniLoc_mProjection = -1;
+GLint uniLoc_mWorldInvTrans = -1;
 
 struct sWindowConfig
 {
@@ -98,6 +99,7 @@ struct sMeshparameters		// for the Meshes' input file
 };
 
 // Forward declare the Functions
+void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods );
 void loadConfigFile( std::string fileName, sWindowConfig& wConfig );
 sGOparameters parseObjLine( std::ifstream &source );
 void loadObjectsFile( std::string fileName );
@@ -112,232 +114,6 @@ std::stringstream loadScriptFile( std::string fileName );
 static void error_callback( int error, const char* description )
 {
 	fprintf( stderr, "Error: %s\n", description );
-}
-
-// All the keyboard input logic is here
-static void key_callback( GLFWwindow* window, int key, int scancode, int action, int mods )
-{	
-	if( key == GLFW_KEY_ESCAPE && action == GLFW_PRESS )
-		glfwSetWindowShouldClose( window, GLFW_TRUE );
-
-	//// Change object in g_GameObject
-	//if ( key == GLFW_KEY_ENTER && action == GLFW_PRESS )
-	//{
-	//	if ( bIsWireframe ) bIsWireframe = false;
-	//	else bIsWireframe = true;
-	//}
-
-	switch( key )
-	{
-		
-	case GLFW_KEY_UP:		// Up arrow
-		//::g_vecGameObjects[g_GameObjNumber]->position.y += 0.10f;
-		::g_pLightManager->vecLights[g_LightObjNumber].position.y += 0.010f;
-		break;
-	case GLFW_KEY_DOWN:		// Down arrow
-		//::g_vecGameObjects[g_GameObjNumber]->position.y -= 0.10f;
-		::g_pLightManager->vecLights[g_LightObjNumber].position.y -= 0.010f;
-		break;
-	case GLFW_KEY_LEFT:		// Left arrow
-		//::g_vecGameObjects[g_GameObjNumber]->position.x -= 0.10f;
-		::g_pLightManager->vecLights[g_LightObjNumber].position.x -= 0.010f;
-		break;
-	case GLFW_KEY_RIGHT:	// Right arrow
-		//::g_vecGameObjects[g_GameObjNumber]->position.x += 0.10f;
-		::g_pLightManager->vecLights[g_LightObjNumber].position.x += 0.010f;
-		break;
-	case GLFW_KEY_LEFT_BRACKET:		// [{ key
-		//::g_vecGameObjects[g_GameObjNumber]->position.z += 0.10f;
-		::g_pLightManager->vecLights[g_LightObjNumber].position.z += 0.010f;
-		break;
-	case GLFW_KEY_RIGHT_BRACKET:		// ]} key
-		//::g_vecGameObjects[g_GameObjNumber]->position.z -= 0.10f;
-		::g_pLightManager->vecLights[g_LightObjNumber].position.z -= 0.010f;
-		break;
-	}
-
-	// Change Camera Position
-	const float CAMERAMOVEMENT = 1.0f;
-	switch( key )
-	{
-	case GLFW_KEY_A:		// Left
-		g_cameraXYZ.x -= CAMERAMOVEMENT;
-		break;
-	case GLFW_KEY_D:		// Right
-		g_cameraXYZ.x += CAMERAMOVEMENT;
-		break;
-	case GLFW_KEY_W:		// Forward (along z)
-		g_cameraXYZ.z += CAMERAMOVEMENT;
-		break;
-	case GLFW_KEY_S:		// Backwards (along z)
-		g_cameraXYZ.z -= CAMERAMOVEMENT;
-		break;
-	case GLFW_KEY_Q:		// "Down" (along y axis)
-		g_cameraXYZ.y -= CAMERAMOVEMENT;
-		break;
-	case GLFW_KEY_E:		// "Up" (along y axis)
-		g_cameraXYZ.y += CAMERAMOVEMENT;
-		break;
-	}
-
-	if( key == GLFW_KEY_P && action == GLFW_PRESS )
-	{	
-		bool newTarget = false;
-		int newTargetPos = ::g_targetShip;
-		while( !newTarget )
-		{	
-			newTargetPos++;
-			if( newTargetPos >= ::g_vecGameObjects.size() ) newTargetPos = 0;
-			if( ::g_vecGameObjects[newTargetPos]->meshName == "viper" ||
-				::g_vecGameObjects[newTargetPos]->meshName == "raider" )
-			{
-				::g_targetShip = newTargetPos;
-				newTarget = true;
-			}
-		}
-
-		::g_cameraTarget_XYZ = glm::vec3( ::g_vecGameObjects[::g_targetShip]->position.x,
-										::g_vecGameObjects[::g_targetShip]->position.y,
-										::g_vecGameObjects[::g_targetShip]->position.z );
-	}
-
-	if( key == GLFW_KEY_C && action == GLFW_PRESS )
-	{
-		if( !::g_lookAtON )
-		{
-			::g_cameraXYZ = glm::vec3( 0.0f, 9.0f, 20.0f );
-			g_lookAtON = true;
-		}
-		else
-		{
-			::g_cameraTarget_XYZ = glm::vec3( 0.0f, 0.0f, 0.0f );
-			::g_cameraXYZ = glm::vec3( -82.0f, 107.0f, 68.0f );
-			::g_lookAtON = false;
-		}
-		
-	}
-
-	if( key == GLFW_KEY_SPACE && action == GLFW_PRESS )
-	{
-		//cCommandGroup* theGroup = new cCommandGroup();
-
-		if( ::g_moveRiders == false ) ::g_moveRiders = true;
-		else ::g_moveRiders = false;
-
-		for( int i = 0; i != ::g_vecGameObjects.size(); i++ )
-		{
-			if( ::g_vecGameObjects[i]->meshName == "raider" )
-			{
-				//cComMoveTo* moveTo = new cComMoveTo();
-				//moveTo->setMyGO( ::g_vecGameObjects[i] );
-
-				//glm::vec3 targetPosition = ::g_vecGameObjects[i]->position;
-				//targetPosition.z += 30.0f;
-
-				//moveTo->init( targetPosition, 5.0f, glm::vec3( 0.0f ) );
-
-				//g_commandVector.push_back( moveTo );
-				//return;
-
-				//cComFollowCurve* moveTo = new cComFollowCurve();
-				//moveTo->setMyGO( ::g_vecGameObjects[i] );
-
-				//glm::vec3 targetPosition = ::g_vecGameObjects[i]->position;
-				//targetPosition.z += 60.0f;
-
-				//glm::vec3 curvePosition = ::g_vecGameObjects[i]->position;
-				//curvePosition.z += 30.0f;
-				//curvePosition.x += 20.0f;
-
-				//moveTo->init( targetPosition, 5.0f, curvePosition );
-				//
-				//theGroup->theCommands.push_back( moveTo );
-			}
-		}
-		//g_theScheduler.commandGroups.push_back( theGroup );
-	}
-
-	if( key == GLFW_KEY_V && action == GLFW_PRESS )
-	{
-		bool newTarget = false;
-		int newTargetPos = ::g_selectedShip;
-		while( !newTarget )
-		{
-			newTargetPos++;
-			if( newTargetPos >= ::g_vecGameObjects.size() ) newTargetPos = 0;
-			if( ::g_vecGameObjects[newTargetPos]->meshName == "viper" )
-			{
-				::g_selectedShip = newTargetPos;
-				newTarget = true;
-			}
-		}
-		::g_vecGameObjects[::g_selectedShip]->position = glm::vec3( -14.0f, -0.1f, 80.0f );
-		::g_cameraTarget_XYZ = glm::vec3( -13.7f, 0.5f, 0.0f );
-		::g_cameraXYZ = ::g_vecGameObjects[::g_selectedShip]->position;
-		::g_cameraXYZ.y += 0.1f;
-	}
-
-	if( key == GLFW_KEY_ENTER &&  action == GLFW_PRESS )
-	{
-		::g_vecGameObjects[::g_selectedShip]->vel = glm::vec3( 0.0f, 0.0f, -2.0f );
-		::g_vecGameObjects[::g_selectedShip]->isMoving = true;
-		::g_movingViper = true;
-	}
-	if( key == GLFW_KEY_ENTER &&  action == GLFW_RELEASE )
-	{
-		::g_vecGameObjects[::g_selectedShip]->vel = glm::vec3( 0.0f, 0.0f, 0.0f );
-		::g_vecGameObjects[::g_selectedShip]->isMoving = false;
-		::g_movingViper = false;
-	}
-
-
-	// Change Camera
-	switch ( key )
-	{
-	case GLFW_KEY_1:
-		//g_LightObjNumber = 0;
-		::g_cameraXYZ = glm::vec3( -82.0f, 107.0f, 68.0f );
-		break;
-	case GLFW_KEY_2:
-		//g_LightObjNumber = 1;
-		::g_cameraXYZ = glm::vec3( -100.0f, 65.0f, 115.0f );
-		break;
-	case GLFW_KEY_3:
-		::g_cameraXYZ = glm::vec3( -23.0f, 12.0f, 131.0f );
-		break;
-	case GLFW_KEY_4:
-		::g_cameraXYZ = glm::vec3( -14.0f, 0.0f, 68.0f );
-		break;
-	case GLFW_KEY_5:
-		::g_cameraXYZ = glm::vec3( 14.0f, 0.0f, 68.0f );
-		break;
-	case GLFW_KEY_6:
-		g_LightObjNumber = 5;
-		break;
-	case GLFW_KEY_7:
-		g_LightObjNumber = 6;
-		break;
-	case GLFW_KEY_8:
-		g_LightObjNumber = 7;
-		break;
-	case GLFW_KEY_9:
-		g_LightObjNumber = 8;
-		break;
-	}
-
-	return;
-}
-
-void UpdateCameraPosition( void )
-{
-	for( int i = 0; i != ::g_vecGameObjects.size(); i++ )
-	{
-		if( ::g_vecGameObjects[i]->isMoving == true )
-		{
-			::g_cameraXYZ = ::g_vecGameObjects[i]->position;
-			::g_cameraXYZ.y += 0.1f;
-		}
-	}
 }
 
 int main( void )
@@ -425,10 +201,10 @@ int main( void )
 	uniLoc_ambientToDiffuseRatio = glGetUniformLocation( currentProgID, "ambientToDiffuseRatio" );
 	uniLoc_materialSpecular = glGetUniformLocation( currentProgID, "materialSpecular" );
 	uniLoc_eyePosition = glGetUniformLocation( currentProgID, "eyePosition" );
-
 	uniLoc_mModel = glGetUniformLocation( currentProgID, "mModel" );
 	uniLoc_mView = glGetUniformLocation( currentProgID, "mView" );
 	uniLoc_mProjection = glGetUniformLocation( currentProgID, "mProjection" );
+	uniLoc_mWorldInvTrans = glGetUniformLocation( currentProgID, "mWorldInvTranspose" );
 
 	::g_pLightManager = new cLightManager();
 
@@ -481,17 +257,25 @@ int main( void )
 	// (We are passing a pointer to the vector of game object pointers... yeah)
 	//::p_LuaScripts->SetObjectVector( &( ::g_vecGameObjects ) );
 
-	// A test script
+	// Load the lua script from file
 	std::stringstream ssTheScript;
 
 	ssTheScript = loadScriptFile( "LuaScript1.txt" );
 
+	// Print the script just in case
 	std::cout << ssTheScript.str() << std::endl;
 
 	::p_LuaScripts->LoadScript( "MoveTo", ssTheScript.str() );
 
 	// Update the lua script manager
 	::p_LuaScripts->Update();
+
+
+	g_pCamera = new cCameraObject();
+	g_pCamera->setCameraPosition( glm::vec3( -170.0f, 50.0f, 80.0f ) );
+	g_pCamera->setCameraOrientationX( -20.0f );
+	g_pCamera->setCameraOrientationY( -60.0f );	
+	g_pCamera->setCameraOrientationZ( -20.0f );
 
 	glEnable( GL_DEPTH );
 
@@ -500,10 +284,10 @@ int main( void )
 
 	// Main game or application loop
 	while( !glfwWindowShouldClose( window ) )
-	{
+	{	
 		float ratio;
 		int width, height;
-		glm::mat4x4 m, p, mvp;			//  mat4x4 m, p, mvp;
+		//glm::mat4x4 m, mvp;			//  mat4x4 m, p, mvp;
 
 		glfwGetFramebufferSize( window, &width, &height );
 		ratio = width / ( float )height;
@@ -518,26 +302,29 @@ int main( void )
 		// (for the whole scene)
 		::g_pLightManager->CopyLightInformationToCurrentShader(); 
 
+		// Camera block
+		glm::mat4x4 matProjection;
+
 		// Projection and view don't change per scene (maybe)
-		p = glm::perspective( 0.6f,			// FOV
+		matProjection = glm::perspective( 0.6f,			// FOV
 			ratio,		// Aspect ratio
 			1.0f,			// Near (as big as possible)
-			100000.0f );	// Far (as small as possible)
+			200000.0f );	// Far (as small as possible)
+
+		g_pCamera->update();
 
 		// View or "camera" matrix
 		glm::mat4 matView = glm::mat4( 1.0f );	// was "v"
 
 		// Now the view matrix is taken right from the camera class
-		matView = glm::lookAt( g_cameraXYZ,						// "eye" or "camera" position
-							   g_cameraTarget_XYZ,				// "At" or "target" 
-							   glm::vec3( 0.0f, 1.0f, 0.0f ) );	// "up" vector
+		matView = glm::lookAt( g_pCamera->getCameraPosition(),		// "eye" or "camera" position
+							   g_pCamera->getLookAtPosition(),		// "At" or "target" 
+							   g_pCamera->getCameraUpVector() );	// "up" vector
 
-		glUniformMatrix4fv( uniLoc_mModel, 1, GL_FALSE,
-			( const GLfloat* )glm::value_ptr( m ) );
 		glUniformMatrix4fv( uniLoc_mView, 1, GL_FALSE,
 			( const GLfloat* )glm::value_ptr( matView ) );
 		glUniformMatrix4fv( uniLoc_mProjection, 1, GL_FALSE,
-			( const GLfloat* )glm::value_ptr( p ) );
+			( const GLfloat* )glm::value_ptr( matProjection ) );
 
 		unsigned int sizeOfVector = ::g_vecGameObjects.size();
 		// "Draw scene" loop
@@ -549,14 +336,21 @@ int main( void )
 			
 		}//for ( int index = 0...
 
-		::g_pDebugRenderer->RenderDebugObjects( matView, p ); // matProjection );
+		::g_pDebugRenderer->RenderDebugObjects( matView, matProjection ); // matProjection );
 		
 		std::stringstream ssTitle;
-		ssTitle << "GEFP Project 2: Battlestar Galactica - "
+		glm::vec3 curCameraPosition = g_pCamera->getCameraPosition();
+		glm::vec3 curCameraLookAt = g_pCamera->getLookAtPosition();
+		ssTitle << "GEFP Project 2: Lua Integration"
 			<< "Camera (xyz): "
-			<< g_cameraXYZ.x << ", "
-			<< g_cameraXYZ.y << ", "
-			<< g_cameraXYZ.z;
+			<< curCameraPosition.x << ", "
+			<< curCameraPosition.y << ", "
+			<< curCameraPosition.z << " | "
+			<< "Camera LookAt(xyz): "
+			<< curCameraLookAt.x << ", "
+			<< curCameraLookAt.y << ", "
+			<< curCameraLookAt.z;
+		
 
 		glfwSetWindowTitle( window, ssTitle.str().c_str() );
 
@@ -920,57 +714,25 @@ void DrawObject( cGameObject* pTheGO )
 	}
 
 	// There IS something to draw
-	glm::mat4x4 m = glm::mat4x4( 1.0f );	//		mat4x4_identity(m);
-
-	glm::mat4 matRreRotZ = glm::mat4x4( 1.0f );
-	matRreRotZ = glm::rotate( matRreRotZ, pTheGO->orientation.z,
-		glm::vec3( 0.0f, 0.0f, 1.0f ) );
-	m = m * matRreRotZ;
-
+	glm::mat4x4 mModel = glm::mat4x4( 1.0f );
+	
 	glm::mat4 trans = glm::mat4x4( 1.0f );
 	trans = glm::translate( trans, pTheGO->position );
-	m = m * trans;
+	mModel = mModel * trans;
 
-	glm::mat4 matPostRotZ = glm::mat4x4( 1.0f );
-	matPostRotZ = glm::rotate( matPostRotZ, pTheGO->orientation2.z,
-		glm::vec3( 0.0f, 0.0f, 1.0f ) );
-	m = m * matPostRotZ;
-
-	// IF the game object isn't a light object, it will rotate as normal
-	if( !pTheGO->bIsLight )
-	{
-		pTheGO->orientation2.x += pTheGO->rotation.x;
-		pTheGO->orientation2.y += pTheGO->rotation.y;
-		pTheGO->orientation2.z += pTheGO->rotation.z;
-	}
-
-	glm::mat4 matPostRotY = glm::mat4x4( 1.0f );
-	matPostRotY = glm::rotate( matPostRotY, pTheGO->orientation2.y,
-		glm::vec3( 0.0f, 1.0f, 0.0f ) );
-	m = m * matPostRotY;
-
-	glm::mat4 matPostRotX = glm::mat4x4( 1.0f );
-	matPostRotX = glm::rotate( matPostRotX, pTheGO->orientation2.x,
-		glm::vec3( 1.0f, 0.0f, 0.0f ) );
-	m = m * matPostRotX;
-	// TODO: add the other rotation matrix (i.e. duplicate code above)
+	mModel = mModel * pTheGO->orientation;
 
 	float finalScale = pTheGO->scale;
 
 	glm::mat4 matScale = glm::mat4x4( 1.0f );
-	matScale = glm::scale( matScale,
-		glm::vec3( finalScale,
-			finalScale,
-			finalScale ) );
-	m = m * matScale;
-	
-	if( ::g_movingViper = true )
-	{
-		UpdateCameraPosition();
-	}
+	matScale = glm::scale( matScale, glm::vec3( finalScale, finalScale, finalScale ) );
+	mModel = mModel * matScale;
 
-	glUniformMatrix4fv( uniLoc_mModel, 1, GL_FALSE,
-		( const GLfloat* )glm::value_ptr( m ) );
+	glUniformMatrix4fv( uniLoc_mModel, 1, GL_FALSE, ( const GLfloat* )glm::value_ptr( mModel ) );
+
+	glm::mat4 mWorldInvTranpose = glm::inverse( glm::transpose( mModel ) );
+	glUniformMatrix4fv( uniLoc_mWorldInvTrans, 1, GL_FALSE, ( const GLfloat* )glm::value_ptr( mWorldInvTranpose ) );
+
 	
 	glUniform4f( uniLoc_materialDiffuse,
 		pTheGO->diffuseColour.r,
