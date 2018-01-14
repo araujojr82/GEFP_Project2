@@ -10,7 +10,7 @@ public:
 	cComMoveTo();
 	~cComMoveTo();
 
-	virtual void init( glm::vec3 destination, float time, glm::vec3 notBeingUsed );
+	virtual void init( glm::vec3 destination, float time, glm::vec3 notUsed1 );
 	virtual void update( double deltaTime );
 	virtual bool isDone();
 	virtual void setMyGO( cGameObject* myGO );
@@ -25,8 +25,10 @@ private:
 	float distanceToTarget;
 	float velocity;
 	double initialTime;
+	double elapsedTime;
 	float duration;
 
+	bool hasStarted;
 
 };
 

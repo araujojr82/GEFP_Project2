@@ -5,6 +5,29 @@
 
 extern cDebugRenderer* g_pDebugRenderer;
 
+cComFollowCurve::cComFollowCurve()
+{
+	this->initPosition = glm::vec3( 0.0f );
+	this->prevPosition = glm::vec3( 0.0f );
+	this->finalPosition = glm::vec3( 0.0f );
+	this->direction = glm::vec3( 0.0f );
+	this->traveledDistance = 0.0f;
+	this->distanceToTarget = 0.0f;
+	this->velocity = 0.0f;
+	this->initialTime = 0;
+	this->elapsedTime = 0;
+
+	this->hasStarted = false;
+
+	return;
+}
+
+cComFollowCurve::~cComFollowCurve()
+{
+	return;
+}
+
+
 // Quadratic Bezier calculation based on
 // https://stackoverflow.com/questions/785097/how-do-i-implement-a-b%C3%A9zier-curve-in-c
 float getPoint( float n1, float n2, float perc )
@@ -59,32 +82,8 @@ float curveLength( glm::vec3 p0, glm::vec3 p1, glm::vec3 p2 )
 	return length;
 }
 
-cComFollowCurve::cComFollowCurve()
-{
-	this->initPosition = glm::vec3( 0.0f );
-	this->prevPosition = glm::vec3( 0.0f );
-	this->finalPosition = glm::vec3( 0.0f );
-	this->direction = glm::vec3( 0.0f );
-	this->traveledDistance = 0.0f;
-	this->distanceToTarget = 0.0f;
-	this->velocity = 0.0f;
-	this->initialTime = 0;
-	this->elapsedTime = 0;
-
-	//count = 0;
-
-	return;
-}
-
-cComFollowCurve::~cComFollowCurve()
-{
-	return;
-}
-
 void cComFollowCurve::init( glm::vec3 destination, float time, glm::vec3 thePoint )
 {
-	this->initPosition = this->theGO->position;
-	this->prevPosition = this->initPosition;
 	this->finalPosition = destination;
 	this->direction = glm::normalize( finalPosition - initPosition );
 	this->distanceToTarget = glm::distance( finalPosition, initPosition );
@@ -93,16 +92,13 @@ void cComFollowCurve::init( glm::vec3 destination, float time, glm::vec3 thePoin
 
 	this->distanceCurveLenght = curveLength( this->initPosition, this->theControlPoint, this->finalPosition );
 
-	//float distance132 = curveLength( this->initPosition, this->finalPosition, this->theControlPoint );
-
 	// This is the average velocity it would take to reach the destination
-	// within this time if it were a Straight line
-	this->velocity = distanceToTarget / time;
+	this->velocity = distanceCurveLenght / time;
 	
-	std::cout << "Linear dist:" << this->distanceToTarget
-		<< " / Curve dist: " << this->distanceCurveLenght
-		//<< " / Curve dist132: " << distance132
-		<< std::endl;
+	//std::cout << "Linear dist:" << this->distanceToTarget
+	//	<< " / Curve dist: " << this->distanceCurveLenght
+	//	//<< " / Curve dist132: " << distance132
+	//	<< std::endl;
 	
 	return;
 }
@@ -114,6 +110,13 @@ void cComFollowCurve::update( double deltaTime )
 	{
 		this->initialTime = glfwGetTime();
 	}
+
+	if( this->hasStarted == false )
+	{
+		this->hasStarted = true;
+		this->initPosition = this->theGO->position;
+		this->prevPosition = this->initPosition;
+	}	
 
 	//float range1 = 0.05 * this->distanceCurveLenght;
 	//float range2 = 0.90 * this->distanceCurveLenght;

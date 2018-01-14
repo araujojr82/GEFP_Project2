@@ -51,12 +51,20 @@ int cCommandHandler::newCommand( lua_State *L )
 	float x2 = lua_tonumber( L, 8 );				// The third parameter 
 	float y2 = lua_tonumber( L, 9 );				// is another vec3
 	float z2 = lua_tonumber( L, 10 );				// end of third parameter	
+	int targetGOID = lua_tonumber( L, 11 );			// (Target) Game Object's ID
 
 	// Find the Command Group by name
 	cCommandGroup* theGroup = ::g_theScheduler.findGroupByName( groupName );
 
 	// Find the Game Object by ID
 	cGameObject* theObject = findObjectByID( theGOID );
+
+	// Find target GO if there's one requested
+	cGameObject* targetObject;
+	if( targetGOID != 0 )
+	{
+		targetObject = findObjectByID( theGOID );
+	}	
 	
 	// Create the new command using the commandName
 	if( commandName == "FollowCurve" )
@@ -68,6 +76,19 @@ int cCommandHandler::newCommand( lua_State *L )
 		glm::vec3 curvePosition = glm::vec3( x2, y2, z2 );
 
 		theCommand->init( targetPosition, time, curvePosition );
+
+		theGroup->theCommands.push_back( theCommand );
+	}
+	else if( commandName == "FollowObject" )
+	{
+		cComFollowObject* theCommand = new cComFollowObject();
+		theCommand->setMyGO( theObject );
+
+		glm::vec3 targetPosition = glm::vec3( x1, y1, z1 );
+		glm::vec3 curvePosition = glm::vec3( x2, y2, z2 );
+
+		theCommand->init( targetPosition, time, curvePosition );
+		theCommand->setTargetGO( targetObject );
 
 		theGroup->theCommands.push_back( theCommand );
 	}
@@ -86,20 +107,17 @@ int cCommandHandler::newCommand( lua_State *L )
 	}
 	else if( commandName == "OrientTo" )
 	{
-		cComMoveTo* theCommand = new cComMoveTo();
-		theCommand->setMyGO( theObject );
 
-		glm::vec3 targetPosition = glm::vec3( x1, y1, z1 );
-
-		// MoveTo doesn't use the second vec3 parameter
-		// just pass blank on it
-		theCommand->init( targetPosition, 5.0f, glm::vec3( 0.0f ) );
-
-		theGroup->theCommands.push_back( theCommand );
 	}
 	else if( commandName == "Rotate" )
 	{
+		cComRotate* theCommand = new cComRotate();
+		theCommand->setMyGO( theObject );
 
+		glm::vec3 degreesToRotate = glm::vec3( x1, y1, z1 );
+
+		theCommand->init( degreesToRotate, time, glm::vec3( 0.0f ) );
+		theGroup->theCommands.push_back( theCommand );
 	}
 	else if( commandName == "Trigger" )
 	{

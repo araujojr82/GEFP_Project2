@@ -5,9 +5,10 @@
 #include "cCommandGroup.h"
 #include "cCommandScheduler.h"
 #include "cComFollowCurve.h"
+#include "cComFollowObject.h"
 #include "cComMoveTo.h"
 #include "cComOrientTo.h"
-#include "cComRotateTo.h"
+#include "cComRotate.h"
 #include "cComTrigger.h"
 
 #include <string>

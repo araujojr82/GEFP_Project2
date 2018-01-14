@@ -33,9 +33,8 @@ private:
 	float elapsedTime;
 	float distanceCurveLenght;
 	
-	//int count;
+	bool hasStarted;
 
-	std::vector< glm::vec3 > curvePoints;
-
+	
 };
 

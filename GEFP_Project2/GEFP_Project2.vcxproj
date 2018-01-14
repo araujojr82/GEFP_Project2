@@ -158,7 +158,7 @@
     <ClCompile Include="cCommandHandler.cpp" />
     <ClCompile Include="cCommandScheduler.cpp" />
     <ClCompile Include="cComOrientTo.cpp" />
-    <ClCompile Include="cComRotateTo.cpp" />
+    <ClCompile Include="cComRotate.cpp" />
     <ClCompile Include="cComTrigger.cpp" />
     <ClCompile Include="cDebugRenderer.cpp" />
     <ClCompile Include="cGameObject.cpp" />
@@ -186,7 +186,7 @@
     <ClInclude Include="cCommandHandler.h" />
     <ClInclude Include="cCommandScheduler.h" />
     <ClInclude Include="cComOrientTo.h" />
-    <ClInclude Include="cComRotateTo.h" />
+    <ClInclude Include="cComRotate.h" />
     <ClInclude Include="cComTrigger.h" />
     <ClInclude Include="cDebugRenderer.h" />
     <ClInclude Include="cGameObject.h" />

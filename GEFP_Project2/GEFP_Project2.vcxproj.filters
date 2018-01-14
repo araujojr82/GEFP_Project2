@@ -69,9 +69,6 @@
     <ClCompile Include="cComMoveTo.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
-    <ClCompile Include="cComRotateTo.cpp">
-      <Filter>Commands</Filter>
-    </ClCompile>
     <ClCompile Include="cComOrientTo.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
@@ -97,6 +94,9 @@
       <Filter>Commands</Filter>
     </ClCompile>
     <ClCompile Include="cCommandHandler.cpp">
+      <Filter>Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="cComRotate.cpp">
       <Filter>Commands</Filter>
     </ClCompile>
   </ItemGroup>
@@ -137,9 +137,6 @@
     <ClInclude Include="cComMoveTo.h">
       <Filter>Commands</Filter>
     </ClInclude>
-    <ClInclude Include="cComRotateTo.h">
-      <Filter>Commands</Filter>
-    </ClInclude>
     <ClInclude Include="cComOrientTo.h">
       <Filter>Commands</Filter>
     </ClInclude>
@@ -168,6 +165,9 @@
       <Filter>Commands</Filter>
     </ClInclude>
     <ClInclude Include="cCommandHandler.h">
+      <Filter>Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="cComRotate.h">
       <Filter>Commands</Filter>
     </ClInclude>
   </ItemGroup>

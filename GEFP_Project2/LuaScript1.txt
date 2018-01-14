@@ -1,4 +1,6 @@
 newGroup( "group1" )
-newCommand( "group1", "MoveTo", 1, 0, 0, -20, 2.0, 0, 0, 0 )
+newCommand( "group1", "MoveTo", 1, 0, 0, -20, 4.0, 0, 0, 0, 0 )
+newCommand( "group1", "Rotate", 1, 0, 90, 0, 4.0, 0, 0, 0, 0 )
 newGroup( "group2" )
-newCommand( "group1", "FollowCurve", 1, 0, 0, -60, 4.0, 20, 0, -40 )
+newCommand( "group2", "FollowCurve", 22, 0, 0, 0, 4.0, 50, 0, -50, 0 )
+newCommand( "group2", "FollowCurve", 1, 0, 0, -60, 4.0, 20, 0, -40, 0 )
