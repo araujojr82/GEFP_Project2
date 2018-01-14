@@ -5,12 +5,12 @@
 
 cComRotate::cComRotate()
 {
-	velocityX = 0.0f;
-	velocityY = 0.0f;
-	velocityZ = 0.0f;
-	initialTime = 0;
-	duration = 0.0f;
-	finalOrientation = glm::vec3( 0.0f, 0.0f, 0.0f );
+	this->velocityX = 0.0f;
+	this->velocityY = 0.0f;
+	this->velocityZ = 0.0f;
+	this->initialTime = 0;
+	this->duration = 0.0f;
+	this->finalOrientation = glm::vec3( 0.0f, 0.0f, 0.0f );
 
 	return;
 }
@@ -30,9 +30,9 @@ void cComRotate::init( glm::vec3 degreesToRotate, float time, glm::vec3 notUsed 
 	this->velocityY	= degreesToRotate.y / time;
 	this->velocityZ = degreesToRotate.z / time;
 
-	this->finalOrientation.x += glm::radians( degreesToRotate.x );
-	this->finalOrientation.y += glm::radians( degreesToRotate.y );
-	this->finalOrientation.z += glm::radians( degreesToRotate.z );
+	this->finalOrientation.x = this->theGO->orientation2.x + glm::radians( degreesToRotate.x );
+	this->finalOrientation.y = this->theGO->orientation2.y + glm::radians( degreesToRotate.y );
+	this->finalOrientation.z = this->theGO->orientation2.z + glm::radians( degreesToRotate.z );
 	
 	return;
 }

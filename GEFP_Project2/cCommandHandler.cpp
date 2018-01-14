@@ -63,7 +63,7 @@ int cCommandHandler::newCommand( lua_State *L )
 	cGameObject* targetObject;
 	if( targetGOID != 0 )
 	{
-		targetObject = findObjectByID( theGOID );
+		targetObject = findObjectByID( targetGOID );
 	}	
 	
 	// Create the new command using the commandName
@@ -107,7 +107,14 @@ int cCommandHandler::newCommand( lua_State *L )
 	}
 	else if( commandName == "OrientTo" )
 	{
+		cComOrientTo* theCommand = new cComOrientTo();
+		theCommand->setMyGO( theObject );
+		theCommand->setTargetGO( targetObject );
 
+		//glm::vec3 degreesToRotate = glm::vec3( x1, y1, z1 );
+
+		theCommand->init( glm::vec3( 0.0f ), time, glm::vec3( 0.0f ) );
+		theGroup->theCommands.push_back( theCommand );
 	}
 	else if( commandName == "Rotate" )
 	{

@@ -50,6 +50,10 @@ public:
 
 	std::string meshName;		// mesh I'd  like to draw
 
+	// right / front / top vector
+	glm::vec3 frontUpVector;
+
+
 private:
 	int m_uniqueID;
 	static int m_nextID;
