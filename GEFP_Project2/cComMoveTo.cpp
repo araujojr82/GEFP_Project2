@@ -14,6 +14,7 @@ cComMoveTo::cComMoveTo()
 	this->elapsedTime = 0;
 
 	this->hasStarted = false;
+	this->isCommandDone = false;
 
 	return;
 }
@@ -33,20 +34,17 @@ void cComMoveTo::init( glm::vec3 destination, float time, glm::vec3 notBeingUsed
 
 void cComMoveTo::update( double deltaTime )
 {
-	// Start the time 
-	if( this->initialTime == 0.0f )
-	{
-		this->initialTime = glfwGetTime();
-	}
 
 	if( this->hasStarted == false )
 	{
+		this->initialTime = glfwGetTime();
 		this->hasStarted = true;
 		this->initPosition = this->theGO->position;
 		this->direction = glm::normalize( finalPosition - initPosition );
 		this->distanceToTarget = glm::distance( finalPosition, initPosition );
 		// This is the average velocity it would take to reach the destination
-		this->velocity = distanceToTarget / this->duration;
+		this->velocity = (float) this->distanceToTarget / this->duration;
+		//this->velocity *= 1.1;
 	}
 	
 	float range1 = 0.02 * this->distanceToTarget;
@@ -55,62 +53,33 @@ void cComMoveTo::update( double deltaTime )
 	this->elapsedTime = glfwGetTime() - this->initialTime;
 
 	float traveledDistance = glm::distance( this->initPosition, this->theGO->position );
-	// It must have some value on the first calculation, otherwise it will return 0
-	// Let's give it 1% of the total distance
-	//if( traveledDistance == 0 ) traveledDistance = 0.01 * this->distanceToTarget;
 
-	// Calculate remaining distance
-	float remainingDistance = glm::distance( this->finalPosition, this->theGO->position );
+	// Using the smooth step 2x to calculate aceleration and deceleration
+	float factor = glm::smoothstep( -0.1f, range1, traveledDistance ) * ( 1 - glm::smoothstep( range2, this->distanceToTarget + 0.1f , traveledDistance ) );
 
-	// If the remaining distance is less then 1%, just move it there and stop
-	if( remainingDistance / this->distanceToTarget <= 0.01 )
-	{
-		this->theGO->position = this->finalPosition;
-		// Set the Velocity to 0
-		this->theGO->vel = glm::vec3( 0.0f, 0.0f, 0.0f );
+	factor = factor * this->velocity;
 
-		//		return;
-	}
+	this->direction = glm::normalize( finalPosition - this->theGO->position );
 
-	else
-	{
-		// Using the smooth step 2x to calculate aceleration and deceleration
-		float factor = glm::smoothstep( -0.1f, range1, traveledDistance ) * ( 1 - glm::smoothstep( range2, this->distanceToTarget, traveledDistance ) );
+	this->theGO->vel = this->direction * factor;
 
-		factor *= this->velocity;
+	// Calculate delta position according to the velocity based on time elapsed
+	glm::vec3 deltaPosition = ( float )deltaTime * this->theGO->vel;
 
-		this->direction = glm::normalize( finalPosition - this->theGO->position );
-
-		this->theGO->vel = this->direction * factor;
-
-		// Calculate delta position according to the velocity based on time elapsed
-		glm::vec3 deltaPosition = ( float )deltaTime * this->theGO->vel;
-
-		// Where the object will be
-		glm::vec3 nextPosition = this->theGO->position += deltaPosition;
-		float nextDistance = glm::distance( finalPosition, nextPosition );
-		//glm::vec3 nextDirection = glm::normalize( finalPosition - nextPosition );
+	// Where the object will be
+	glm::vec3 nextPosition = this->theGO->position += deltaPosition;
+	float nextDistance = glm::distance( finalPosition, nextPosition );
 				
-		//if( nextDirection != this->direction )
-		if( nextDistance > remainingDistance )
-		{ // It means it has inverted the direction, or that it has passed the final position
-		  	this->theGO->position = this->finalPosition;
-		  	// Set the Velocity to 0
-		  	this->theGO->vel = glm::vec3( 0.0f, 0.0f, 0.0f );
-		}
-		else
-		{
-			this->theGO->position += deltaPosition;
-		}			
-	}
+	this->theGO->position += deltaPosition;
 
 	//std::cout
-	//	<< "Object ID: " << this->theGO->getID()
-	//	<< " - Velocity xyz: " << this->theGO->vel.x
+	//	<< "ID: " << this->theGO->getID()
+	//	<< " | Max.vel: " << this->velocity
+	//	<< " | Elapsed Time: " << this->elapsedTime
+	//	<< " | Vel.: " << this->theGO->vel.x
 	//	<< ", " << this->theGO->vel.y << ", " << this->theGO->vel.z
-	//	<< " - Elapsed Time: " << this->elapsedTime
 	//	<< " - Traveled distancet: " << traveledDistance
-	//	<< " - Distance to the target: " << remainingDistance
+	//	//<< " | Distance: " << remainingDistance
 	//	<< std::endl;
 	return;
 }
@@ -118,10 +87,13 @@ void cComMoveTo::update( double deltaTime )
 
 bool cComMoveTo::isDone()
 {
+	if( this->isCommandDone ) return true;
+
 	// If the GO is on destination, clear the velocity 
 	if( this->theGO->position == this->finalPosition ||
 		this->elapsedTime >= this->duration )
 	{
+		this->isCommandDone = true;
 		// Set the Velocity
 		this->theGO->vel = glm::vec3( 0.0f, 0.0f, 0.0f );
 		return true;

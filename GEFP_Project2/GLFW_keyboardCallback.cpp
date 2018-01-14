@@ -8,7 +8,11 @@
 
 #include <iostream>
 
+#include "cLuaBrain.h"
+
 extern cCameraObject* g_pCamera;
+extern cLuaBrain* p_LuaScripts;
+
 
 bool isShiftKeyDown( int mods, bool bByItself = true );
 bool isCtrlKeyDown( int mods, bool bByItself = true );
@@ -24,6 +28,7 @@ void key_callback( GLFWwindow* window,
 		glfwSetWindowShouldClose( window, GLFW_TRUE );
 
 	if( key == GLFW_KEY_SPACE )
+		//::p_LuaScripts->Update();
 		return;
 
 	if( key == GLFW_KEY_0 && action == GLFW_PRESS )

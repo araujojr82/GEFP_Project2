@@ -29,6 +29,7 @@ private:
 	float duration;
 
 	bool hasStarted;
+	bool isCommandDone;
 
 };
 

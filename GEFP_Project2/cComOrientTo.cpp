@@ -3,13 +3,11 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
 cComOrientTo::cComOrientTo()
 {
-	//this->initPosition = glm::vec3( 0.0f, 0.0f, 0.0f );
-	//this->finalPosition = glm::vec3( 0.0f, 0.0f, 0.0f );
-	this->direction = glm::vec3( 0.0f, 0.0f, 0.0f );
-	//this->distanceToTarget = 0.0f;
-	this->velocity = 0.0f;
 	this->initialTime = 0;
 
 	this->hasStarted = false;
@@ -17,8 +15,11 @@ cComOrientTo::cComOrientTo()
 	this->velocityY = 0.0f;
 	this->velocityZ = 0.0f;
 	this->duration = 0.0f;
-	this->finalOrientation = glm::vec3( 0.0f, 0.0f, 0.0f );
-
+	this->theUpVector = glm::vec3( 0.0f );
+	this->lookAtOrigin = glm::vec3( 0.0f );
+	this->lookAtPosition = glm::vec3( 0.0f );
+	this->initialOrientation = glm::mat4x4( 1.0f );
+	this->finalOrientation = glm::mat4x4( 1.0f );
 	return;
 }
 
@@ -29,10 +30,10 @@ cComOrientTo::~cComOrientTo()
 
 void cComOrientTo::init( glm::vec3 unused1, float time, glm::vec3 unused )
 {
-	this->initPosition = this->theGO->position;
-	this->finalPosition = this->targetGO->position;
-	this->direction = glm::normalize( finalPosition - initPosition );
-	this->distanceToTarget = glm::distance( finalPosition, initPosition );
+	//this->initPosition = this->theGO->position;
+	//this->finalPosition = this->targetGO->position;
+	//this->direction = glm::normalize( finalPosition - initPosition );
+	//this->distanceToTarget = glm::distance( finalPosition, initPosition );
 	this->duration = time;
 
 	// This is the average velocity it would take to reach the destination
@@ -44,78 +45,48 @@ void cComOrientTo::init( glm::vec3 unused1, float time, glm::vec3 unused )
 
 void cComOrientTo::update( double deltaTime )
 {
+
 	if( this->hasStarted == false )
 	{
 		this->hasStarted = true;
+		this->theUpVector = glm::vec3( 0.0f, 1.0f, 0.0f );
 
-		glm::vec3 degreesToRotate = glm::vec3( 0.0f );
-		glm::vec3 vectorToTarget = glm::vec3( 0.0f );
-		glm::vec3 theFrontVector = glm::vec3( 0.0f );
+		// LookAt direction at the origin
+		this->lookAtOrigin = this->targetGO->position - this->theGO->position;
 
-		vectorToTarget = glm::normalize( glm::vec3( 0.0f, 0.0f, this->targetGO->position.z ) -
-									     glm::vec3( 0.0f, 0.0f, this->theGO->position.z ) );
+		// Normalized lookAt at the origin
+		this->lookAtOrigin = glm::normalize( this->lookAtOrigin );
 
-		theFrontVector = glm::vec3( 0.0f, 0.0f, -1.0f );
+		// New LooAt
+		this->lookAtPosition = this->theGO->position + this->lookAtOrigin;
 
-		degreesToRotate.y = glm::degrees( glm::acos( glm::dot( vectorToTarget, theFrontVector ) ) );
+		// Care about the orientation too
+		this->finalOrientation = glm::inverse( glm::lookAt( glm::vec3( 0.0f, 0.0f, 0.0f ), this->lookAtOrigin, this->theUpVector ) );
 
-		/*vectorToTarget = glm::normalize( glm::vec3( 0.0f, this->targetGO->position.y, 0.0f ) -
-									     glm::vec3( 0.0f, this->theGO->position.y, 0.0f ) );*/
-		vectorToTarget = glm::normalize( this->targetGO->position - this->theGO->position );
+		this->initialOrientation = this->theGO->orientation;
 
-		theFrontVector = glm::vec3( 0.0f, 1.0f, -1.0f );
-		degreesToRotate.x = glm::degrees( glm::acos( glm::dot( vectorToTarget, theFrontVector ) ) );
-
-		this->velocityX = degreesToRotate.x / this->duration;
-		this->velocityY = degreesToRotate.y / this->duration;
-		//this->velocityZ = degreesToRotate.z / time;
-
-		this->finalOrientation.x = this->theGO->orientation2.x + glm::radians( degreesToRotate.x );
-		this->finalOrientation.y = this->theGO->orientation2.y + glm::radians( degreesToRotate.y );
-		this->finalOrientation.z = this->theGO->orientation2.z;
-
+		this->initialTime = glfwGetTime();
 	}
+		
+	//glm::mat4x4 orientationStep = this->orientationSpeed * glm::mat4x4( deltaTime );
 
-	float rotateX = velocityX * deltaTime;
-	float rotateY = velocityY * deltaTime;
-	//float rotateZ = velocityZ * deltaTime;
+	glm::quat quatStart = glm::quat_cast( this->initialOrientation );
+	glm::quat quatEnd = glm::quat_cast( this->finalOrientation );
 
-	glm::vec3 newOrientation = this->theGO->orientation2;
+	this->elapsedTime = glfwGetTime() - this->initialTime;
 
-	newOrientation.x += glm::radians( rotateX );
-	newOrientation.y += glm::radians( rotateY );
-	//newOrientation.z += glm::radians( rotateZ );
+	float factor = this->elapsedTime / this->duration;
 
-	// Check newOrientation can't pass the finalOrientation
-	if( ( rotateX > 0.0f && newOrientation.x > this->finalOrientation.x ) ||
-		( rotateX < 0.0f && newOrientation.x < this->finalOrientation.x ) )
-	{
-		this->theGO->orientation2.x = this->finalOrientation.x;
-	}
-	else
-	{
-		this->theGO->orientation2.x = newOrientation.x;
-	}
+	//glm::quat quatInterp = glm::slerp( quatStart, quatEnd, factor );
+	glm::quat quatInterp = glm::mix( quatStart, quatEnd, factor );
 
-	if( ( rotateY > 0.0f && newOrientation.y > this->finalOrientation.y ) ||
-		( rotateY < 0.0f && newOrientation.y < this->finalOrientation.y ) )
-	{
-		this->theGO->orientation2.y = this->finalOrientation.y;
-	}
-	else
-	{
-		this->theGO->orientation2.y = newOrientation.y;
-	}
+	std::cout 
+		<< "Factor: " << factor
+		<< " / Elapsed: " << elapsedTime
+		<< std::endl;
 
-	//if( ( rotateZ > 0.0f && newOrientation.z > this->finalOrientation.z ) ||
-	//	( rotateZ < 0.0f && newOrientation.z < this->finalOrientation.z ) )
-	//{
-	//	this->theGO->orientation2.z = this->finalOrientation.z;
-	//}
-	//else
-	//{
-	//	this->theGO->orientation2.z = newOrientation.z;
-	//}
+
+	this->theGO->orientation = glm::mat4_cast( quatInterp );
 
 	return;
 }
@@ -123,15 +94,20 @@ void cComOrientTo::update( double deltaTime )
 
 bool cComOrientTo::isDone()
 {
-	// If the GO is on destination, clear the velocity 
-	if( this->theGO->position == this->finalPosition )
+	if( this->hasStarted == false )
 	{
-		// Set the Velocity
-		this->theGO->vel = glm::vec3( 0.0f, 0.0f, 0.0f );
-		return true;
+		return false;
 	}
 	else
-		return false;
+	{
+		if( this->theGO->orientation == this->finalOrientation
+			|| this->elapsedTime >= this->duration )
+		{
+			return true;
+		}
+		else
+			return false;
+	}
 }
 
 void cComOrientTo::setMyGO( cGameObject* myGO )

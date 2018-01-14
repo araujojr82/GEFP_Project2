@@ -22,16 +22,19 @@ public:
 private:
 	cGameObject* theGO;
 
-	glm::vec3 initPosition;
-	glm::vec3 finalPosition;
-	glm::vec3 direction;
-	float distanceToTarget;
-	float velocity;
 	double initialTime;
+	double elapsedTime;
 	float duration;
 
 	float velocityX, velocityY, velocityZ;
-	glm::vec3 finalOrientation;
+
+	glm::vec3 theUpVector;
+	glm::vec3 lookAtOrigin;
+	glm::vec3 lookAtPosition;
+	glm::mat4x4 initialOrientation;
+	glm::mat4x4 finalOrientation;
+	//glm::mat4x4 deltaOrientation;
+	//glm::mat4x4 orientationSpeed;
 
 	bool hasStarted;
 

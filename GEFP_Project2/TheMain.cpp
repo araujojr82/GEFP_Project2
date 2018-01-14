@@ -106,7 +106,7 @@ void loadObjectsFile( std::string fileName );
 sMeshparameters parseMeshLine( std::ifstream &source );
 void loadMeshesFile( std::string fileName, GLint ShaderID );
 void loadLightObjects();
-void PhysicsStep( double deltaTime );
+//void PhysicsStep( double deltaTime );
 void updateAllObjects( double deltaTime );
 void DrawObject( cGameObject* pTheGO );
 std::stringstream loadScriptFile( std::string fileName );
@@ -272,10 +272,12 @@ int main( void )
 
 
 	g_pCamera = new cCameraObject();
-	g_pCamera->setCameraPosition( glm::vec3( -170.0f, 50.0f, 80.0f ) );
-	g_pCamera->setCameraOrientationX( -20.0f );
+	g_pCamera->setCameraPosition( glm::vec3( -170.0f, 100.0f, 50.0f ) );
+	/*g_pCamera->setCameraOrientationX( -20.0f );
 	g_pCamera->setCameraOrientationY( -60.0f );	
-	g_pCamera->setCameraOrientationZ( -20.0f );
+	g_pCamera->setCameraOrientationZ( -20.0f );*/
+
+	g_pCamera->setCameraTarget( glm::vec3( 0.0f ) );
 
 	glEnable( GL_DEPTH );
 
