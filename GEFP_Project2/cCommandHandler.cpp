@@ -24,7 +24,7 @@ cGameObject* findObjectByID( unsigned int ID )
 		}
 	}
 	// Didn't find it
-	return 0;
+	return nullptr;
 }
 
 int cCommandHandler::newGroup( lua_State *L )
@@ -62,9 +62,9 @@ int cCommandHandler::newCommand( lua_State *L )
 	// Find target GO if there's one requested
 	cGameObject* targetObject;
 	if( targetGOID != 0 )
-	{
 		targetObject = findObjectByID( targetGOID );
-	}	
+	else
+		targetObject = nullptr;
 	
 	// Create the new command using the commandName
 	if( commandName == "FollowCurve" )
@@ -99,9 +99,9 @@ int cCommandHandler::newCommand( lua_State *L )
 
 		glm::vec3 targetPosition = glm::vec3( x1, y1, z1 );
 
-		// MoveTo doesn't use the second vec3 parameter
-		// just pass blank on it
 		theCommand->init( targetPosition, time, glm::vec3( 0.0f ) );
+
+		theCommand->setTargetGO( targetObject );
 
 		theGroup->theCommands.push_back( theCommand );
 	}

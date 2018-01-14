@@ -37,6 +37,9 @@ void cComMoveTo::update( double deltaTime )
 
 	if( this->hasStarted == false )
 	{
+		if( this->targetGO != nullptr ) // Get the position from the target GO
+			this->finalPosition = this->targetGO->position;
+
 		this->initialTime = glfwGetTime();
 		this->hasStarted = true;
 		this->initPosition = this->theGO->position;
@@ -44,7 +47,7 @@ void cComMoveTo::update( double deltaTime )
 		this->distanceToTarget = glm::distance( finalPosition, initPosition );
 		// This is the average velocity it would take to reach the destination
 		this->velocity = (float) this->distanceToTarget / this->duration;
-		//this->velocity *= 1.1;
+
 	}
 	
 	float range1 = 0.02 * this->distanceToTarget;
@@ -59,7 +62,7 @@ void cComMoveTo::update( double deltaTime )
 
 	factor = factor * this->velocity;
 
-	this->direction = glm::normalize( finalPosition - this->theGO->position );
+	//this->direction = glm::normalize( this->finalPosition - this->theGO->position );
 
 	this->theGO->vel = this->direction * factor;
 
@@ -111,4 +114,15 @@ void cComMoveTo::setMyGO( cGameObject* myGO )
 cGameObject* cComMoveTo::getMyGO()
 {
 	return this->theGO;
+}
+
+void cComMoveTo::setTargetGO( cGameObject* target )
+{
+	this->targetGO = target;
+	return;
+}
+
+cGameObject* cComMoveTo::getTargetGO()
+{
+	return this->targetGO;
 }

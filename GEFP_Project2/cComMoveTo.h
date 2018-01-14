@@ -16,6 +16,9 @@ public:
 	virtual void setMyGO( cGameObject* myGO );
 	virtual cGameObject* getMyGO();
 
+	void setTargetGO( cGameObject* target );
+	cGameObject* getTargetGO();
+
 private:
 	cGameObject* theGO;
 
@@ -31,5 +34,6 @@ private:
 	bool hasStarted;
 	bool isCommandDone;
 
+	cGameObject* targetGO;
 };
 
