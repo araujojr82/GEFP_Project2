@@ -255,7 +255,7 @@ int main( void )
 	::p_LuaScripts = new cLuaBrain();
 	// Point to all the game objects
 	// (We are passing a pointer to the vector of game object pointers... yeah)
-	//::p_LuaScripts->SetObjectVector( &( ::g_vecGameObjects ) );
+	::p_LuaScripts->SetObjectVector( &( ::g_vecGameObjects ) );
 
 	// Load the lua script from file
 	std::stringstream ssTheScript;

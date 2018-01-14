@@ -40,6 +40,8 @@ public:
 	// called "getObjectState" in lua
 	//static int l_GetObjectState( lua_State *L );
 
+	static int getObjectPosition( lua_State *L );
+
 private:
 	std::map< std::string /*scriptName*/,
 		std::string /*scriptSource*/ > m_mapScripts;

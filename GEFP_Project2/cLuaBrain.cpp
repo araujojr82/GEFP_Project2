@@ -26,8 +26,35 @@ cLuaBrain::cLuaBrain()
 	lua_pushcfunction( this->m_pLuaState, cCommandHandler::newCommand );
 	lua_setglobal( this->m_pLuaState, "newCommand" );
 
+	lua_pushcfunction( this->m_pLuaState, cLuaBrain::getObjectPosition );
+	lua_setglobal( this->m_pLuaState, "getObjectPosition" );
+
 
 	return;
+}
+
+int cLuaBrain::getObjectPosition( lua_State *L )
+{
+	// Getting the values from the Lua Script
+	int theGOID = lua_tonumber( L, 1 );				// (Commanded) Game Object's ID
+	std::string coordinate = lua_tostring( L, 1 );	// The coordinate we're looking for
+
+	//cGameObject* theGO = m_findObjectByID( theGOID );
+
+	cGameObject* theGO = m_findObjectByID( theGOID );
+
+	if( theGO != nullptr )
+	{
+		if( coordinate == "X" || coordinate == "x" )
+			lua_pushnumber( L, theGO->position.x );
+		else if( coordinate == "Y" || coordinate == "y" )
+			lua_pushnumber( L, theGO->position.y );
+		else if( coordinate == "Z" || coordinate == "z" )
+			lua_pushnumber( L, theGO->position.z );
+		
+		return 1;
+	}
+	return 0;
 }
 
 cLuaBrain::~cLuaBrain()

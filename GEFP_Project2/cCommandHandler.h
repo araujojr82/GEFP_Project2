@@ -36,7 +36,7 @@ public:
 
 	static int newGroup( lua_State *L ); // <- C Lua Function
 
-	static int newCommand( lua_State *L ); // <- C Lua Function
+	static int newCommand( lua_State *L ); // <- C Lua Function	
 
 };
 
