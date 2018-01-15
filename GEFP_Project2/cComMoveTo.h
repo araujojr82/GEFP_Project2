@@ -19,7 +19,10 @@ public:
 	void setTargetGO( cGameObject* target );
 	cGameObject* getTargetGO();
 
+	virtual void setMyID( int myID );
+
 private:
+	int m_uniqueID;
 	cGameObject* theGO;
 
 	glm::vec3 initPosition;

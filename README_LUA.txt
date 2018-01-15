@@ -18,6 +18,7 @@ There is 11 parameters that can be passed on this method;
 7) Float, usually used as time/duration;
 8, 9, 10) Floats; usually used as a second coordinates set (xyz)
 11) Int; A second Game Object used on commands like FollowObject or OrientTo;
+12) String: A subscript of commands to be executed; (Used at the Trigger command)
 
 FollowCurve:
 4, 5, 6) First set of XYZ is the Destination;
@@ -30,7 +31,7 @@ FollowObject
 5) The maximum following distance;
 6) 
 7) Max. Speed
-8, 9, 10) Second set of XYZ is the curve's control point;
+8, 9, 10) Not used
 11) The target Game Object's ID
 
 MoveTo
@@ -38,6 +39,7 @@ MoveTo
 7) Duration of the movement;
 8, 9, 10) Not used;
 11) Not used;
+11) The target Game Object's ID is optional
 
 OrientTo
 4, 5, 6) 
@@ -45,14 +47,9 @@ OrientTo
 8, 9, 10)
 11) The target Game Object's ID
 
-Rotate
-4, 5, 6) How much to rotate on each axis
-7) Duration of the movement;
-8, 9, 10)
-11)
-
 Trigger
 4, 5, 6) XYZ Position of the Trigger 
 7) The radius of the Triggers activation sphere
-8, 9, 10) 
-11)
+8, 9, 10)  Not used;
+11) Not used;
+12) The commands to be executed when in range, can cointain one or more groups.

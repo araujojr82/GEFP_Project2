@@ -1,0 +1,4 @@
+newGroup( "group51" )
+newCommand( "group51", "MoveTo", 23, 0, 50, 50, 4.0, 0, 0, 0, 0, "" )
+newGroup( "group52" )
+newCommand( "group52", "MoveTo", 23, 0, 50, -20, 2.0, 0, 0, 0, 0, "" )

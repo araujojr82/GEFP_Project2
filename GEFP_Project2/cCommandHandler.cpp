@@ -4,6 +4,9 @@
 extern std::vector< cGameObject* > g_vecGameObjects;
 extern cCommandScheduler g_theScheduler;
 
+//static 
+int cCommandHandler::m_nextCommandID = 1;
+
 cCommandHandler::cCommandHandler()
 {
 }
@@ -47,11 +50,12 @@ int cCommandHandler::newCommand( lua_State *L )
 	float x1 = lua_tonumber( L, 4 );				// The first parameter of a command
 	float y1 = lua_tonumber( L, 5 );				// is a vec3 
 	float z1 = lua_tonumber( L, 6 );				// end of first parameter
-	float time = lua_tonumber( L, 7 );				// The second is a float (time)
+	float secondParameter = lua_tonumber( L, 7 );	// The second is a float ( usually time )
 	float x2 = lua_tonumber( L, 8 );				// The third parameter 
 	float y2 = lua_tonumber( L, 9 );				// is another vec3
 	float z2 = lua_tonumber( L, 10 );				// end of third parameter	
 	int targetGOID = lua_tonumber( L, 11 );			// (Target) Game Object's ID
+	std::string subCommands = lua_tostring( L, 12 );// The sub-commands string
 
 	// Find the Command Group by name
 	cCommandGroup* theGroup = ::g_theScheduler.findGroupByName( groupName );
@@ -70,24 +74,32 @@ int cCommandHandler::newCommand( lua_State *L )
 	if( commandName == "FollowCurve" )
 	{
 		cComFollowCurve* theCommand = new cComFollowCurve();
+		
+		theCommand->setMyID( cCommandHandler::m_nextCommandID );		
+		cCommandHandler::m_nextCommandID++;
+
 		theCommand->setMyGO( theObject );
 
 		glm::vec3 targetPosition = glm::vec3( x1, y1, z1 );
 		glm::vec3 curvePosition = glm::vec3( x2, y2, z2 );
 
-		theCommand->init( targetPosition, time, curvePosition );
+		theCommand->init( targetPosition, secondParameter, curvePosition );
 
 		theGroup->theCommands.push_back( theCommand );
 	}
 	else if( commandName == "FollowObject" )
 	{
 		cComFollowObject* theCommand = new cComFollowObject();
+
+		theCommand->setMyID( cCommandHandler::m_nextCommandID );
+		cCommandHandler::m_nextCommandID++;
+
 		theCommand->setMyGO( theObject );
 
 		glm::vec3 targetPosition = glm::vec3( x1, y1, z1 );
 		glm::vec3 curvePosition = glm::vec3( x2, y2, z2 );
 
-		theCommand->init( targetPosition, time, curvePosition );
+		theCommand->init( targetPosition, secondParameter, curvePosition );
 		theCommand->setTargetGO( targetObject );
 
 		theGroup->theCommands.push_back( theCommand );
@@ -95,11 +107,15 @@ int cCommandHandler::newCommand( lua_State *L )
 	else if( commandName == "MoveTo" )
 	{
 		cComMoveTo* theCommand = new cComMoveTo();
+
+		theCommand->setMyID( cCommandHandler::m_nextCommandID );
+		cCommandHandler::m_nextCommandID++;
+
 		theCommand->setMyGO( theObject );
 
 		glm::vec3 targetPosition = glm::vec3( x1, y1, z1 );
 
-		theCommand->init( targetPosition, time, glm::vec3( 0.0f ) );
+		theCommand->init( targetPosition, secondParameter, glm::vec3( 0.0f ) );
 
 		theCommand->setTargetGO( targetObject );
 
@@ -108,27 +124,47 @@ int cCommandHandler::newCommand( lua_State *L )
 	else if( commandName == "OrientTo" )
 	{
 		cComOrientTo* theCommand = new cComOrientTo();
+
+		theCommand->setMyID( cCommandHandler::m_nextCommandID );
+		cCommandHandler::m_nextCommandID++;
+
 		theCommand->setMyGO( theObject );
 		theCommand->setTargetGO( targetObject );
 
 		//glm::vec3 degreesToRotate = glm::vec3( x1, y1, z1 );
 
-		theCommand->init( glm::vec3( 0.0f ), time, glm::vec3( 0.0f ) );
+		theCommand->init( glm::vec3( 0.0f ), secondParameter, glm::vec3( 0.0f ) );
 		theGroup->theCommands.push_back( theCommand );
 	}
 	else if( commandName == "Rotate" )
 	{
 		cComRotate* theCommand = new cComRotate();
+
+		theCommand->setMyID( cCommandHandler::m_nextCommandID );
+		cCommandHandler::m_nextCommandID++;
+
 		theCommand->setMyGO( theObject );
 
 		glm::vec3 degreesToRotate = glm::vec3( x1, y1, z1 );
 
-		theCommand->init( degreesToRotate, time, glm::vec3( 0.0f ) );
+		theCommand->init( degreesToRotate, secondParameter, glm::vec3( 0.0f ) );
 		theGroup->theCommands.push_back( theCommand );
 	}
 	else if( commandName == "Trigger" )
 	{
+		cComTrigger* theCommand = new cComTrigger();
 
+		theCommand->setMyID( cCommandHandler::m_nextCommandID );
+		cCommandHandler::m_nextCommandID++;
+
+		theCommand->setMyGO( theObject );
+
+		glm::vec3 triggerPosition = glm::vec3( x1, y1, z1 );
+
+		theCommand->init( triggerPosition, secondParameter, glm::vec3( 0.0f ) );
+		theCommand->createSubGroup( subCommands );
+
+		theGroup->theCommands.push_back( theCommand );
 	}
 	else	// Command isn't mapped yet
 	{		// Do nothing

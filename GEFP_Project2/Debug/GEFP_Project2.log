@@ -1,4 +1,8 @@
-﻿  cComMoveTo.cpp
-d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\ccommoveto.cpp(53): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\ccommoveto.cpp(54): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+﻿  TheMain.cpp
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(231): warning C4305: '=': truncation from 'double' to 'float'
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(232): warning C4305: '=': truncation from 'double' to 'float'
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(233): warning C4305: '=': truncation from 'double' to 'float'
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(234): warning C4305: '=': truncation from 'double' to 'float'
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(461): warning C4244: 'initializing': conversion from 'std::chrono::system_clock::rep' to 'unsigned int', possible loss of data
+d:\fanshawe\code\myprojects\gefp_project2\gefp_project2\themain.cpp(415): warning C4715: 'loadScriptFile': not all control paths return a value
   GEFP_Project2.vcxproj -> D:\Fanshawe\Code\MyProjects\GEFP_Project2\Debug\Project2.exe

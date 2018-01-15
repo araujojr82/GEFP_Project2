@@ -3,6 +3,12 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 
+void cComRotate::setMyID( int myID )
+{
+	this->m_uniqueID = myID;
+	return;
+}
+
 cComRotate::cComRotate()
 {
 	this->velocityX = 0.0f;
@@ -11,6 +17,9 @@ cComRotate::cComRotate()
 	this->initialTime = 0;
 	this->duration = 0.0f;
 	this->finalOrientation = glm::vec3( 0.0f, 0.0f, 0.0f );
+
+	this->hasStarted = false;
+	this->isCommandDone = false;
 
 	return;
 }
@@ -85,9 +94,12 @@ void cComRotate::update( double deltaTime )
 
 bool cComRotate::isDone()
 {
+	if( this->isCommandDone ) return true;
+
 	// If the GO is on destination, clear the velocity 
 	if( this->theGO->orientation2 == finalOrientation )	
 	{
+		this->isCommandDone = true;
 		return true;
 	}
 	else

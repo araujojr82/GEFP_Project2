@@ -265,11 +265,11 @@ int main( void )
 	// Print the script just in case
 	std::cout << ssTheScript.str() << std::endl;
 
-	::p_LuaScripts->LoadScript( "MoveTo", ssTheScript.str() );
+	::p_LuaScripts->LoadScript( "LuaScript1", ssTheScript.str() );
 
 	// Update the lua script manager
 	::p_LuaScripts->Update();
-
+	::p_LuaScripts->DeleteScript( "LuaScript1" );
 
 	g_pCamera = new cCameraObject();
 	g_pCamera->setCameraPosition( glm::vec3( -170.0f, 100.0f, 50.0f ) );
@@ -382,7 +382,6 @@ int main( void )
 // Load Lua external Script
 std::stringstream loadScriptFile( std::string fileName )
 {
-	// TODO change this config formating
 	std::ifstream infoFile( fileName );
 	if( !infoFile.is_open() )
 	{	// File didn't open...
@@ -578,6 +577,15 @@ void loadObjectsFile( std::string fileName )
 			}
 			// NO VELOCITY
 			pTempGO->vel = glm::vec3( 0.0f );
+
+			// Change Raider initial rotation
+			if( pTempGO->meshName == "raider" )
+			{
+				//Adjust the raiders so they are looking at Z positive
+				pTempGO->orientation[0].x = -1.0f;
+				pTempGO->orientation[2].z = -1.0f;
+			}
+			
 
 			::g_vecGameObjects.push_back( pTempGO );
 		}

@@ -3,6 +3,12 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 
+void cComMoveTo::setMyID( int myID )
+{
+	this->m_uniqueID = myID;
+	return;
+}
+
 cComMoveTo::cComMoveTo()
 {
 	this->initPosition = glm::vec3( 0.0f, 0.0f, 0.0f );

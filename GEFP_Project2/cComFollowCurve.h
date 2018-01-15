@@ -17,7 +17,10 @@ public:
 	virtual void setMyGO( cGameObject* myGO );
 	virtual cGameObject* getMyGO();
 
+	virtual void setMyID( int myID );
+
 private:
+	int m_uniqueID;
 	cGameObject* theGO;
 
 	glm::vec3 initPosition;
@@ -34,7 +37,7 @@ private:
 	float distanceCurveLenght;
 	
 	bool hasStarted;
-
+	bool isCommandDone;
 	
 };
 

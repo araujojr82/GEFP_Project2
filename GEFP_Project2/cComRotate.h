@@ -15,8 +15,10 @@ public:
 	virtual bool isDone();
 	virtual void setMyGO( cGameObject* myGO );
 	virtual cGameObject* getMyGO();
+	virtual void setMyID( int myID );
 
 private:
+	int m_uniqueID;
 	cGameObject* theGO;
 
 	double initialTime;
@@ -25,7 +27,8 @@ private:
 	float velocityX, velocityY, velocityZ;
 	glm::vec3 finalOrientation;
 
-	
+	bool hasStarted;
+	bool isCommandDone;
 
 
 };

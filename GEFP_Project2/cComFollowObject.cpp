@@ -3,6 +3,12 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 
+void cComFollowObject::setMyID( int myID )
+{
+	this->m_uniqueID = myID;
+	return;
+}
+
 cComFollowObject::cComFollowObject()
 {
 	initPosition = glm::vec3( 0.0f, 0.0f, 0.0f );
@@ -11,6 +17,9 @@ cComFollowObject::cComFollowObject()
 	distanceToTarget = 0.0f;
 	velocity = 0.0f;
 	initialTime = 0;
+
+	this->hasStarted = false;
+	this->isCommandDone = false;
 
 	return;
 }
@@ -43,6 +52,8 @@ void cComFollowObject::update( double deltaTime )
 
 bool cComFollowObject::isDone()
 {
+	if( this->isCommandDone ) return true;
+
 	//// If the GO is on destination, clear the velocity 
 	//if( this->theGO->position == this->finalPosition )
 	//{

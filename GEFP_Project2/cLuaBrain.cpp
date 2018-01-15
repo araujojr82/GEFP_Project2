@@ -13,13 +13,6 @@ cLuaBrain::cLuaBrain()
 
 	luaL_openlibs( this->m_pLuaState );					/* Lua 5.3.3 */
 
-
-	//lua_pushcfunction( this->m_pLuaState, cLuaBrain::l_UpdateObject );
-	//lua_setglobal( this->m_pLuaState, "setObjectState" );
-
-	//lua_pushcfunction( this->m_pLuaState, cLuaBrain::l_GetObjectState );
-	//lua_setglobal( this->m_pLuaState, "getObjectState" );
-
 	lua_pushcfunction( this->m_pLuaState, cCommandHandler::newGroup );
 	lua_setglobal( this->m_pLuaState, "newGroup" );
 
@@ -29,7 +22,6 @@ cLuaBrain::cLuaBrain()
 	lua_pushcfunction( this->m_pLuaState, cLuaBrain::getObjectPosition );
 	lua_setglobal( this->m_pLuaState, "getObjectPosition" );
 
-
 	return;
 }
 
@@ -38,9 +30,7 @@ int cLuaBrain::getObjectPosition( lua_State *L )
 	// Getting the values from the Lua Script
 	int theGOID = lua_tonumber( L, 1 );				// (Commanded) Game Object's ID
 	std::string coordinate = lua_tostring( L, 1 );	// The coordinate we're looking for
-
-	//cGameObject* theGO = m_findObjectByID( theGOID );
-
+	
 	cGameObject* theGO = m_findObjectByID( theGOID );
 
 	if( theGO != nullptr )
@@ -76,7 +66,11 @@ void cLuaBrain::LoadScript( std::string scriptName,
 
 void cLuaBrain::DeleteScript( std::string scriptName )
 {
-	// TODO: delete this scritp
+	std::map< std::string, std::string >::iterator it;
+
+	it = m_mapScripts.find( scriptName );
+	m_mapScripts.erase( it );                   // erasing by iterator
+
 	return;
 }
 
@@ -147,76 +141,8 @@ void cLuaBrain::Update() // float deltaTime )
 	return;
 }
 
-//// Called by Lua
-//// Passes object ID, new velocity, etc.
-//// Returns valid (true or false)
-//// Passes: 
-//// - position (xyz)
-//// - velocity (xyz)
-//// called "setObjectState" in lua
-///*static*/ int cLuaBrain::l_UpdateObject( lua_State *L )
-//{
-//	int objectID = lua_tonumber( L, 1 );	/* get argument */
-//
-//											// Exist? 
-//	cGameObject* pGO = cLuaBrain::m_findObjectByID( objectID );
-//
-//	if( pGO == nullptr )
-//	{	// No, it's invalid
-//		lua_pushboolean( L, false );
-//		// I pushed 1 thing on stack, so return 1;
-//		return 1;
-//	}
-//
-//	// Object ID is valid
-//	// Get the values that lua pushed and update object
-//	pGO->position.x = lua_tonumber( L, 2 );	/* get argument */
-//	pGO->position.y = lua_tonumber( L, 3 );	/* get argument */
-//	pGO->position.z = lua_tonumber( L, 4 );	/* get argument */
-//	pGO->vel.x = lua_tonumber( L, 5 );	/* get argument */
-//	pGO->vel.y = lua_tonumber( L, 6 );	/* get argument */
-//	pGO->vel.z = lua_tonumber( L, 7 );	/* get argument */
-//
-//	lua_pushboolean( L, true );	// index is OK
-//
-//	return 1;		// There were 7 things on the stack
-//
-//}
-//
-//// Passes object ID
-//// Returns valid (true or false)
-//// - position (xyz)
-//// - velocity (xyz)
-//// called "getObjectState" in lua
-///*static*/ int cLuaBrain::l_GetObjectState( lua_State *L )
-//{
-//	int objectID = lua_tonumber( L, 1 );	/* get argument */
-//
-//											// Exist? 
-//	cGameObject* pGO = cLuaBrain::m_findObjectByID( objectID );
-//
-//	if( pGO == nullptr )
-//	{	// No, it's invalid
-//		lua_pushboolean( L, false );
-//		// I pushed 1 thing on stack, so return 1;
-//		return 1;
-//	}
-//
-//	// Object ID is valid
-//	lua_pushboolean( L, true );	// index is OK
-//	lua_pushnumber( L, pGO->position.x );
-//	lua_pushnumber( L, pGO->position.y );
-//	lua_pushnumber( L, pGO->position.z );
-//	lua_pushnumber( L, pGO->vel.x );
-//	lua_pushnumber( L, pGO->vel.y );
-//	lua_pushnumber( L, pGO->vel.z );
-//
-//	return 7;		// There were 7 things on the stack
-//}
-
 /*static*/
 std::vector< cGameObject* >* cLuaBrain::m_p_vecGOs;
-
 
 // returns nullptr if not found
 /*static*/ cGameObject* cLuaBrain::m_findObjectByID( int ID )

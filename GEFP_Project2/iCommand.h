@@ -18,7 +18,6 @@ public:
 	virtual bool isDone() = 0;
 	virtual void setMyGO( cGameObject* myGO ) = 0;
 	virtual cGameObject* getMyGO() = 0;
-
 };
 
 

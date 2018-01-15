@@ -38,6 +38,8 @@ public:
 
 	static int newCommand( lua_State *L ); // <- C Lua Function	
 
+private:
+	static int m_nextCommandID;
 };
 
 #endif

@@ -18,8 +18,10 @@ public:
 
 	void setTargetGO( cGameObject* target );
 	cGameObject* getTargetGO();
+	virtual void setMyID( int myID );
 
 private:
+	int m_uniqueID;
 	cGameObject* theGO;
 
 	double initialTime;
@@ -28,6 +30,7 @@ private:
 
 	float velocityX, velocityY, velocityZ;
 
+	glm::vec3 initialPosition;
 	glm::vec3 theUpVector;
 	glm::vec3 lookAtOrigin;
 	glm::vec3 lookAtPosition;
@@ -37,6 +40,7 @@ private:
 	//glm::mat4x4 orientationSpeed;
 
 	bool hasStarted;
+	bool isCommandDone;
 
 	cGameObject* targetGO;
 };

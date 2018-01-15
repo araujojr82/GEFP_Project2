@@ -5,6 +5,12 @@
 
 extern cDebugRenderer* g_pDebugRenderer;
 
+void cComFollowCurve::setMyID( int myID )
+{
+	this->m_uniqueID = myID;
+	return;
+}
+
 cComFollowCurve::cComFollowCurve()
 {
 	this->initPosition = glm::vec3( 0.0f );
@@ -18,6 +24,7 @@ cComFollowCurve::cComFollowCurve()
 	this->elapsedTime = 0;
 
 	this->hasStarted = false;
+	this->isCommandDone = false;
 
 	return;
 }
@@ -222,15 +229,13 @@ void cComFollowCurve::update( double deltaTime )
 
 bool cComFollowCurve::isDone()
 {
-	//if( this->count == 100 )
-	//	return true;
-	//else
-	//	return false;
+	if( this->isCommandDone ) return true;
 
 	// If the GO is on destination, return true;
 	if( this->theGO->position == this->finalPosition ||
 		this->elapsedTime >= this->duration )
 	{		
+		this->isCommandDone = true;
 		return true;
 	}
 	else
