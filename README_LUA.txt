@@ -29,8 +29,8 @@ FollowCurve:
 FollowObject
 4) The minimum following distance;
 5) The maximum following distance;
-6) 
-7) Max. Speed
+6) Max. Speed
+7) Duration of the Follow
 8, 9, 10) Not used
 11) The target Game Object's ID
 

@@ -10,7 +10,7 @@ public:
 	cComFollowObject();
 	~cComFollowObject();
 
-	virtual void init( glm::vec3 destination, float time, glm::vec3 notBeingUsed );
+	virtual void init( glm::vec3 destination, float time, glm::vec3 relativeToTarget );
 	virtual void update( double deltaTime );
 	virtual bool isDone();
 	virtual void setMyGO( cGameObject* myGO );
@@ -24,12 +24,19 @@ private:
 	int m_uniqueID;
 	cGameObject* theGO;
 
+	glm::vec3 idealLocationRelToTarget;
+	float follow_distance_max_speed;
+	float follow_distance_zero_speed;
+	float follow_max_speed;	
+
 	glm::vec3 initPosition;
 	glm::vec3 finalPosition;
+	glm::vec3 idealPosition;
 	glm::vec3 direction;
 	float distanceToTarget;
-	float velocity;
+	glm::vec3 velocity;
 	double initialTime;
+	double elapsedTime;
 	float duration;
 
 	cGameObject* targetGO;

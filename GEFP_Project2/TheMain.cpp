@@ -272,11 +272,7 @@ int main( void )
 	::p_LuaScripts->DeleteScript( "LuaScript1" );
 
 	g_pCamera = new cCameraObject();
-	g_pCamera->setCameraPosition( glm::vec3( -170.0f, 100.0f, 50.0f ) );
-	/*g_pCamera->setCameraOrientationX( -20.0f );
-	g_pCamera->setCameraOrientationY( -60.0f );	
-	g_pCamera->setCameraOrientationZ( -20.0f );*/
-
+	g_pCamera->setCameraPosition( glm::vec3( -175.0f, 105.0f, 40.0f ) );
 	g_pCamera->setCameraTarget( glm::vec3( 0.0f ) );
 
 	glEnable( GL_DEPTH );

@@ -95,11 +95,12 @@ int cCommandHandler::newCommand( lua_State *L )
 		cCommandHandler::m_nextCommandID++;
 
 		theCommand->setMyGO( theObject );
+		theCommand->setTargetGO( targetObject );
 
-		glm::vec3 targetPosition = glm::vec3( x1, y1, z1 );
-		glm::vec3 curvePosition = glm::vec3( x2, y2, z2 );
+		glm::vec3 followParam = glm::vec3( x1, y1, z1 );
+		glm::vec3 relativeToTarget = glm::vec3( x2, y2, z2 );
 
-		theCommand->init( targetPosition, secondParameter, curvePosition );
+		theCommand->init( followParam, secondParameter, relativeToTarget );
 		theCommand->setTargetGO( targetObject );
 
 		theGroup->theCommands.push_back( theCommand );
