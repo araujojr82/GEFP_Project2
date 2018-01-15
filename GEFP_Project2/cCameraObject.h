@@ -53,6 +53,9 @@ public:
 	void setVelocity( float newVelocity );
 	glm::vec3 getVelocity();
 
+	void setMyGO( cGameObject* theCameraGO );
+	cGameObject* getMyGO( );
+
 private:
 	glm::vec3 camPosition;
 	glm::vec3 lookAtPosition;
@@ -61,6 +64,7 @@ private:
 	float camVelocity;
 	eCameraMode cameraMode;
 	cGameObject* controlledGameObject;
+	cGameObject* myGO;
 };
 
 #endif // !_cCameraObject_HG_

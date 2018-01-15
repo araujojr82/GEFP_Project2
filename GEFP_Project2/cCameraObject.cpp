@@ -12,13 +12,30 @@ cCameraObject::cCameraObject()
 	this->camVelocity = 0.0f;
 	this->cameraMode = MANUAL;
 	this->controlledGameObject = NULL;
+	this->myGO = NULL;
+}
+
+void cCameraObject::setMyGO( cGameObject* theCameraGO )
+{
+	this->myGO = theCameraGO;
+	return;
+}
+
+cGameObject* cCameraObject::getMyGO()
+{
+
+	return this->myGO;
 }
 
 void cCameraObject::setCameraPosition( glm::vec3 newPosition )
 {
 	// Use the delta postion as an input to the new lookAt position
-	glm::vec3 derivedLookAt = this->lookAtPosition - this->camPosition;
-	this->camPosition = newPosition;
+	//glm::vec3 derivedLookAt = this->lookAtPosition - this->camPosition;
+	//this->camPosition = newPosition;
+	//this->lookAtPosition = newPosition + derivedLookAt;
+
+	glm::vec3 derivedLookAt = this->lookAtPosition - this->myGO->position;
+	this->myGO->position = newPosition;
 	this->lookAtPosition = newPosition + derivedLookAt;
 }
 
@@ -28,16 +45,16 @@ void cCameraObject::setCameraTarget( glm::vec3 target )
 	this->camUpVector = glm::vec3( 0.0f, 1.0f, 0.0f );
 
 	// LookAt direction at the origin
-	glm::vec3 lookAtOrigin = target - this->camPosition;
+	glm::vec3 lookAtOrigin = target - this->myGO->position;
 
 	// Normalized lookAt at the origin
 	lookAtOrigin = glm::normalize( lookAtOrigin );
 
 	// New LooAt
-	this->lookAtPosition = this->camPosition + lookAtOrigin;
+	this->lookAtPosition = this->myGO->position + lookAtOrigin;
 
 	// Care about the orientation too
-	this->camOrientation = glm::inverse( glm::lookAt( glm::vec3( 0.0f, 0.0f, 0.0f ), lookAtOrigin, this->camUpVector ) );
+	this->myGO->orientation = glm::inverse( glm::lookAt( glm::vec3( 0.0f, 0.0f, 0.0f ), lookAtOrigin, this->camUpVector ) );
 }
 
 void cCameraObject::lockOnGameObject( cGameObject* GO )
@@ -74,6 +91,20 @@ void cCameraObject::update()
 	//    this->moveCameraUpNDown(2.0f);
 	//    this->setCameraOrientationX(-10.0f);
 	//}
+
+	// Move the camera to the target
+	this->camPosition = this->myGO->position;
+
+	// Reorient the camera according to the target
+	this->camUpVector = this->myGO->orientation * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
+	glm::vec3 lookAtOrigin = (this->myGO->orientation * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
+	this->camOrientation = glm::inverse(glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), lookAtOrigin, this->camUpVector));
+	this->lookAtPosition = this->camPosition + lookAtOrigin;
+
+	//// Reposition the camera to a better 'Follow' style
+	//this->moveCameraBackNForth(6.0f);
+	//this->moveCameraUpNDown(2.0f);
+	//this->setCameraOrientationX(-10.0f);
 }
 
 void cCameraObject::moveCameraBackNForth( float speed )
@@ -82,9 +113,9 @@ void cCameraObject::moveCameraBackNForth( float speed )
 	glm::vec4 originZ = glm::vec4( 0.0f, 0.0f, speed, 0.0f );
 
 	// Transfor the vector according to the rotation of the camera
-	glm::vec3 newOriginZ = this->camOrientation * originZ;
+	glm::vec3 newOriginZ = this->myGO->orientation * originZ;
 
-	setCameraPosition( this->camPosition + newOriginZ );
+	setCameraPosition( this->myGO->position + newOriginZ );
 }
 
 void cCameraObject::moveCameraLeftNRight( float speed )
@@ -93,9 +124,9 @@ void cCameraObject::moveCameraLeftNRight( float speed )
 	glm::vec4 originX = glm::vec4( speed, 0.0f, 0.0f, 0.0f );
 
 	// Transfor the vector according to the rotation of the camera
-	glm::vec3 newOriginX = this->camOrientation * originX;
+	glm::vec3 newOriginX = this->myGO->orientation * originX;
 
-	setCameraPosition( this->camPosition + newOriginX );
+	setCameraPosition( this->myGO->position + newOriginX );
 }
 
 void cCameraObject::moveCameraUpNDown( float speed )
@@ -104,27 +135,27 @@ void cCameraObject::moveCameraUpNDown( float speed )
 	glm::vec4 originY = glm::vec4( 0.0f, speed, 0.0f, 0.0f );
 
 	// Transfor the vector according to the rotation of the camera
-	glm::vec3 newOriginY = this->camOrientation * originY;
+	glm::vec3 newOriginY = this->myGO->orientation * originY;
 
-	setCameraPosition( this->camPosition + newOriginY );
+	setCameraPosition( this->myGO->position + newOriginY );
 }
 
 void cCameraObject::changeAlongX( float change )
 {
 	glm::vec3 vecChange = glm::vec3( change, 0.0f, 0.0f );
-	setCameraPosition( this->camPosition + vecChange );
+	setCameraPosition( this->myGO->position + vecChange );
 }
 
 void cCameraObject::changeAlongY( float change )
 {
 	glm::vec3 vecChange = glm::vec3( 0.0f, change, 0.0f );
-	setCameraPosition( this->camPosition + vecChange );
+	setCameraPosition( this->myGO->position + vecChange );
 }
 
 void cCameraObject::changeAlongZ( float change )
 {
 	glm::vec3 vecChange = glm::vec3( 0.0f, 0.0f, change );
-	setCameraPosition( this->camPosition + vecChange );
+	setCameraPosition( this->myGO->position + vecChange );
 }
 
 void cCameraObject::setCameraOrientationX( float degrees )
@@ -133,10 +164,10 @@ void cCameraObject::setCameraOrientationX( float degrees )
 	float newOrientation = glm::radians( degrees );
 	glm::mat4x4 matRotX = glm::mat4x4( 1.0f );
 	matRotX = glm::rotate( matRotX, newOrientation, glm::vec3( 1.0f, 0.0f, 0.0f ) );
-	this->camOrientation = this->camOrientation * matRotX;
+	this->myGO->orientation = this->myGO->orientation * matRotX;
 
 	// Transform the vector X to the new orientation
-	glm::vec3 newVecX = this->camOrientation * glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f );
+	glm::vec3 newVecX = this->myGO->orientation * glm::vec4( 1.0f, 0.0f, 0.0f, 0.0f );
 
 	// Transform according to camera local axis
 	glm::mat4x4 matRotX_Local = glm::mat4x4( 1.0f );
@@ -155,14 +186,14 @@ void cCameraObject::setCameraOrientationX( float degrees )
 	//-------------------------------------------------------------------------
 
 	// LookAt at origin
-	glm::vec3 lookAtOrigin = this->lookAtPosition - this->camPosition;
+	glm::vec3 lookAtOrigin = this->lookAtPosition - this->myGO->position;
 	glm::vec4 v4_lookAtOrigin = { lookAtOrigin, 0.0f };
 
 	// Transformed LookAt at origin
 	glm::vec3 transLookAtOrigin = matRotX_Local * v4_lookAtOrigin;
 
 	// New LookAt position
-	this->lookAtPosition = this->camPosition + transLookAtOrigin;
+	this->lookAtPosition = this->myGO->position + transLookAtOrigin;
 }
 
 void cCameraObject::setCameraOrientationY( float degrees )
@@ -171,10 +202,10 @@ void cCameraObject::setCameraOrientationY( float degrees )
 	float newOrientation = glm::radians( degrees );
 	glm::mat4x4 matRotY = glm::mat4x4( 1.0f );
 	matRotY = glm::rotate( matRotY, newOrientation, glm::vec3( 0.0f, 1.0f, 0.0f ) );
-	this->camOrientation = this->camOrientation * matRotY;
+	this->myGO->orientation = this->myGO->orientation * matRotY;
 
 	// Transform the vector Y to the new orientation
-	glm::vec3 newVecY = this->camOrientation * glm::vec4( 0.0f, 1.0f, 0.0f, 0.0f );
+	glm::vec3 newVecY = this->myGO->orientation * glm::vec4( 0.0f, 1.0f, 0.0f, 0.0f );
 
 	// Transform according to camera local axis
 	glm::mat4x4 matRotY_Local = glm::mat4x4( 1.0f );
@@ -193,14 +224,14 @@ void cCameraObject::setCameraOrientationY( float degrees )
 	//-------------------------------------------------------------------------
 
 	// LookAt at origin
-	glm::vec3 lookAtOrigin = this->lookAtPosition - this->camPosition;
+	glm::vec3 lookAtOrigin = this->lookAtPosition - this->myGO->position;
 	glm::vec4 v4_lookAtOrigin = { lookAtOrigin, 0.0f };
 
 	// Transformed LookAt at origin
 	glm::vec3 transLookAtOrigin = matRotY_Local * v4_lookAtOrigin;
 
 	// New LookAt position
-	this->lookAtPosition = this->camPosition + transLookAtOrigin;
+	this->lookAtPosition = this->myGO->position + transLookAtOrigin;
 }
 
 void cCameraObject::setCameraOrientationZ( float degrees )
@@ -212,10 +243,10 @@ void cCameraObject::setCameraOrientationZ( float degrees )
 	float newOrientation = glm::radians( degrees );
 	glm::mat4x4 matRotZ = glm::mat4x4( 1.0f );
 	matRotZ = glm::rotate( matRotZ, newOrientation, glm::vec3( 0.0f, 0.0f, 1.0f ) );
-	this->camOrientation = this->camOrientation * matRotZ;
+	this->myGO->orientation = this->myGO->orientation * matRotZ;
 
 	// Transform the vector Z to the new orientation
-	glm::vec3 newVecZ = this->camOrientation * glm::vec4( 0.0f, 0.0f, 1.0f, 0.0f );
+	glm::vec3 newVecZ = this->myGO->orientation * glm::vec4( 0.0f, 0.0f, 1.0f, 0.0f );
 
 	// Transform according to camera local axis
 	glm::mat4x4 matRotZ_Local = glm::mat4x4( 1.0f );
@@ -239,7 +270,7 @@ void cCameraObject::setCameraMode( eCameraMode cameraMode )
 void cCameraObject::getCameraInfo( glm::vec3 &camPosition,
 	glm::vec3 &lookAtPosition )
 {
-	camPosition = this->camPosition;
+	camPosition = this->myGO->position;
 	lookAtPosition = this->lookAtPosition;
 }
 
@@ -250,7 +281,7 @@ eCameraMode cCameraObject::getCameraMode()
 
 glm::vec3 cCameraObject::getCameraPosition()
 {
-	return this->camPosition;
+	return this->myGO->position;
 }
 
 glm::vec3 cCameraObject::getLookAtPosition()
