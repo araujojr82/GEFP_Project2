@@ -116,7 +116,9 @@ int cCommandHandler::newCommand( lua_State *L )
 
 		glm::vec3 targetPosition = glm::vec3( x1, y1, z1 );
 
-		theCommand->init( targetPosition, secondParameter, glm::vec3( 0.0f ) );
+		glm::vec3 smoothStepParam = glm::vec3( x2, y2, 0 );
+
+		theCommand->init( targetPosition, secondParameter, smoothStepParam );
 
 		theCommand->setTargetGO( targetObject );
 

@@ -10,7 +10,7 @@ public:
 	cComMoveTo();
 	~cComMoveTo();
 
-	virtual void init( glm::vec3 destination, float time, glm::vec3 notUsed1 );
+	virtual void init( glm::vec3 destination, float time, glm::vec3 theSmoothStepParam );
 	virtual void update( double deltaTime );
 	virtual bool isDone();
 	virtual void setMyGO( cGameObject* myGO );
@@ -33,6 +33,9 @@ private:
 	double initialTime;
 	double elapsedTime;
 	float duration;
+
+	float smoothRange1;
+	float smoothRange2;
 
 	bool hasStarted;
 	bool isCommandDone;
