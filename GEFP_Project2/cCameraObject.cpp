@@ -99,7 +99,7 @@ void cCameraObject::update()
 	this->camUpVector = this->myGO->orientation * glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
 	glm::vec3 lookAtOrigin = (this->myGO->orientation * glm::vec4(0.0f, 0.0f, 1.0f, 0.0f));
 	this->camOrientation = glm::inverse(glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), lookAtOrigin, this->camUpVector));
-	this->lookAtPosition = this->camPosition + lookAtOrigin;
+	this->lookAtPosition = this->camPosition - lookAtOrigin;
 
 	//// Reposition the camera to a better 'Follow' style
 	//this->moveCameraBackNForth(6.0f);

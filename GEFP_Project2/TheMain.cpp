@@ -129,6 +129,8 @@ int main( void )
 	sWindowConfig wConfig;
 
 	cGameObject* theCameraGO = new cGameObject();
+	theCameraGO->meshName = "sphere";
+	theCameraGO->scale = 1.0f;
 	::g_vecGameObjects.push_back( theCameraGO );
 
 	loadConfigFile( "config.txt", wConfig );
@@ -271,18 +273,18 @@ int main( void )
 	::p_LuaScripts->LoadScript( "LuaScript1", ssTheScript.str() );
 
 	// Update the lua script manager
-	//::p_LuaScripts->Update();
+	::p_LuaScripts->Update();
 	::p_LuaScripts->DeleteScript( "LuaScript1" );
 
 	g_pCamera = new cCameraObject();
 
 	g_pCamera->setMyGO( theCameraGO );
 	g_pCamera->setCameraPosition( glm::vec3( -175.0f, 105.0f, 40.0f ) );
-//	g_pCamera->setCameraTarget( glm::vec3( 0.0f ) );
+	g_pCamera->setCameraTarget( glm::vec3( 0.0f ) );
 
 	::g_pCamera->lockOnGameObject( theCameraGO );
 	::g_pCamera->setCameraMode( FOLLOW_CAMERA );
-	g_pCamera->setCameraTarget( glm::vec3( 0.0f ) );
+	//g_pCamera->setCameraTarget( glm::vec3( 0.0f ) );
 
 	glEnable( GL_DEPTH );
 
